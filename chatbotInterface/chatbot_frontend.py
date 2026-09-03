@@ -10,20 +10,19 @@ if 'message_history' not in st.session_state:
 
 def stream_with_delay(chunks, delay=0.02):
     for chunk in chunks:
-        for word in chunk.split(" "):
-            yield word + " "
-            time.sleep(delay) 
+         yield chunk
+         time.sleep(delay) 
 
 for message in st.session_state['message_history']: 
     with st.chat_message(message['role']):
-        st.text(message['content'])
+        st.markdown(message['content'])
     
 user_input = st.chat_input("Type here...")    
 
 if user_input: 
     st.session_state['message_history'].append({'role': 'user', 'content': user_input})
     with st.chat_message("user"):
-        st.text(user_input)
+        st.markdown(user_input)
      
     
     
