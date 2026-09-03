@@ -10,8 +10,9 @@ if 'message_history' not in st.session_state:
 
 def stream_with_delay(chunks, delay=0.02):
     for chunk in chunks:
-        yield chunk
-        time.sleep(delay) 
+        for word in chunk.split(" "):
+            yield word + " "
+            time.sleep(delay) 
 
 for message in st.session_state['message_history']: 
     with st.chat_message(message['role']):
