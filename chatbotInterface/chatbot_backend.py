@@ -1,5 +1,6 @@
 from langgraph.graph import StateGraph , START , END
 from langchain_mistralai import ChatMistralAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from typing import TypedDict , Literal , Annotated
 from dotenv import load_dotenv
 from langchain_core.messages import BaseMessage , HumanMessage
@@ -17,7 +18,7 @@ class chatState(TypedDict):
     
 
 
-llm = ChatMistralAI()
+llm = ChatGoogleGenerativeAI(model="gemini-3.5-flash")
 
 def chat_node(state: chatState):
     
@@ -39,8 +40,6 @@ graph.add_edge(START, "chat_node")
 graph.add_edge("chat_node", END)
 
 chatbot = graph.compile(checkpointer=checkpointer)
-
-
 
 
 # thread_id = '1'
