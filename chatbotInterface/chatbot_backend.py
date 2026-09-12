@@ -5,8 +5,9 @@ from typing import TypedDict , Literal , Annotated
 from dotenv import load_dotenv
 from langchain_core.messages import BaseMessage , HumanMessage
 from pydantic import BaseModel , Field
-from langgraph.checkpoint.memory import MemorySaver
+from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.graph.message import add_messages
+import sqlite3
 load_dotenv()
 
 
@@ -29,8 +30,9 @@ def chat_node(state: chatState):
     return {'messages': [response]}
 
 
+connection = sqlite3.connect(database='chatbot.db' , check_same_thread=False)
 
-checkpointer = MemorySaver()
+checkpointer = SqliteSaver(conn=connection)
 
 graph = StateGraph(chatState)
 
@@ -42,14 +44,9 @@ graph.add_edge("chat_node", END)
 chatbot = graph.compile(checkpointer=checkpointer)
 
 
-# thread_id = '1'
-
-# while True:
-    
-#     user_message = input('Type here: ')
-#     print('User: ' , user_message)
-#     if(user_message.strip().lower() in ['exit','quit','bye']):
-#         break
-#     config = {'configurable': {'thread_id': thread_id}}
-#     response = chatbot.invoke({'messages': HumanMessage(content=user_message)}, config=config)
-#     print('AI: ' ,response['messages'][-1].content)    
+def retrieve_threads():
+    all_threads = set()
+    for checkpoint in checkpointer.list(None):
+        all_threads.add(checkpoint.config["configurable"]['thread_id'])
+        
+    return list(all_threads)   
